@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ParsingDataController;
+use app\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,12 +16,31 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('dashboard.index');
+})->name('dashboard');
+
+// Route::get('/products', function () {
+//     return view('dashboard.product.index');
+// })->name('product.index');
+
+// Route::resource('products', ProductController::class)->only([
+//     'index', 'store', 'destory'
+// ])->names('produk');
+
+Route::resource('home', App\Http\Controllers\HomeController::class);
+Route::resource('products', App\Http\Controllers\ProductController::class);
+Route::resource('contact', App\Http\Controllers\ContactController::class);
+
+Route::prefix('admin')->group(function () {
+    Route::resource('home', App\Http\Controllers\HomeController::class);
+    Route::resource('products', App\Http\Controllers\ProductController::class);
+    Route::resource('contact', App\Http\Controllers\ContactController::class);
 });
 
-Route::get('/products', function () {
-    return view('dashboard.product.index');
-})->name('product.index');
+Route::get('/parse-data/{nama_lengkap}/{email}/{jenis_kelamin}',
+    [App\Http\Controllers\ParsingDataController::class, 'parseData']);
+
+
 
 Auth::routes();
 

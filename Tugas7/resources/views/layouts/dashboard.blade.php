@@ -36,6 +36,23 @@
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
+                    {{-- <h1>{{$title}}</h1>
+                    @if (isset($breadcrumbs) && count($breadcrumbs) > 0)
+                        <div class="page-titles">
+                            <ol class="breadcrumb">
+                                @foreach ( $breadcrumbs as $i => $item )
+                                    @if ($i == count($breadcrumbs) - 1)
+                                        <li class="breadcrumb-item active"><a
+                                            href="javascript:void(0)">{{$item->name}}</a>
+                                        </li>
+                                    @else
+                                        <li class="breadcrumb-item"><a href="javascript:void(0)">{{$item->name}}</a>
+                                        </li>
+                                    @endif
+                                @endforeach
+                            </ol>
+                        </div>
+                    @endisset --}}
                     @yield('content')
                 </div>
                 <!-- /.container-fluid -->
