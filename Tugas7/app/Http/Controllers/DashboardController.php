@@ -6,59 +6,65 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $data = [];
+
+    public function __construct()
     {
-        //
+        $this->data['breadcrumbs'] = [];
+        $this->data['pageLevels'] = [];
+        $this->data['title'] = 'Dashboard';
+        $this->data['notifications'] = (object) [
+            'unread' => 0,
+            'notifications' => [],
+        ];
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    protected function addBreadcrumb($name, $url = null)
     {
-        //
+        $breadcrumb = (object) [
+            'name' => $name,
+            'url' => $url
+        ];
+
+        $this->data['breadcrumbs'][] = $breadcrumb;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    // protected function addPageLevel($key, $value, $url = "#")
+    // {
+    //     $this->data['pageLevels'][] = (object) [
+    //         'key' => $key,
+    //         'value' => $value,
+    //         'url' => $url,
+    //     ];
+    // }
+
+    protected function getBreadcrumbs()
     {
-        //
+        return $this->data['breadcrumbs'];
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    protected function setTitle($title)
     {
-        //
+        $this->data['title'] = $title;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    protected function getTitle()
     {
-        //
+        return $this->data['title'];
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    protected function setData($key, $value)
     {
-        //
+        $this->data[$key] = $value;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    protected function getData($key)
     {
-        //
+        return $this->data[$key] ?? null;
+    }
+
+    protected function setDrillUp($url)
+    {
+        $this->data['drillUp'] = $url;
     }
 }

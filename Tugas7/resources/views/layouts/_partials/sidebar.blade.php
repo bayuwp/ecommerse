@@ -24,7 +24,7 @@
 
     <!-- Nav Item - Charts -->
     <li class="nav-item">
-        <a class="nav-link" href="{{ route('product.index')}}">
+        <a class="nav-link" href="{{ route('dashboard.products.index')}}">
             <i class="fas fa-fw fa-chart-area"></i>
             <span>Products</span></a>
     </li>
