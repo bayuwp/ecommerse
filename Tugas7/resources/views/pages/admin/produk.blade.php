@@ -1,56 +1,105 @@
-@extends('layouts.app')  <!-- Menggunakan template dari app.blade.php -->
+@extends('layouts.app')
 
 @section('container')
-<!-- Begin Page Content -->
-<div class="container-fluid">
+    <p>Body Products</p>
 
-    <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Galeri Produk</h1>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        Launch demo modal
+    </button>
+
+    <div id="product-list" class="row mt-3">
+        @foreach($products as $product)
+            <div class="card" style="width: 18rem; margin: 10px;">
+                <img src="{{ $product->foto_produk }}" class="card-img-top" alt="{{ $product->nama }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ $product->nama }}</h5>
+                    <p class="card-text">{{ $product->deskripsi }}</p>
+                    <p class="card-text">{{ $product->harga }}</p>
+                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                </div>
+            </div>
+        @endforeach
     </div>
 
-    <!-- Button Filter -->
-    <div class="row">
-        <div class="col-12 text-center my-3">
-            <button class="btn btn-primary filter-btn" data-category="all">Show All</button>
-            <button class="btn btn-secondary filter-btn" data-category="1">Category 1</button>
-            <button class="btn btn-secondary filter-btn" data-category="2">Category 2</button>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Tambah Produk</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="product-form" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <!-- Kategori -->
+                        <label for="kategori" class="col-form-label">Kategori:</label>
+                        <select class="form-control" id="kategori" name="kategori_id" required>
+                            <option value="">Pilih Kategori</option>
+                            @foreach ($kategoris as $kategori)
+                                <option value="{{ $kategori->id }}">{{ $kategori->nama }}</option>
+                            @endforeach
+                        </select>
+
+                        <!-- Nama Produk -->
+                        <label for="product-name" class="col-form-label">Nama Produk:</label>
+                        <input type="text" class="form-control" id="product-name" name="nama" required>
+
+                        <!-- Harga Produk -->
+                        <label for="product-price" class="col-form-label">Harga Produk:</label>
+                        <input type="number" class="form-control" id="product-price" name="harga" step="0.01" required>
+
+                        <!-- Foto Produk -->
+                        <label for="product-photo" class="col-form-label">Foto Produk:</label>
+                        <input type="file" class="form-control" id="product-photo" name="foto_produk" accept="image/jpeg, image/png, image/gif">
+
+
+                        <!-- Deskripsi Produk -->
+                        <label for="product-description" class="col-form-label">Deskripsi Produk:</label>
+                        <textarea class="form-control" id="product-description" name="deskripsi" rows="3"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="submitForm()">Save changes</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-
-    <!-- Carousel Section -->
-    <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="{{ asset('upload/p_headline_60-kata-kata-kamado-tanjiro-di-anime-ki-26bb2a.jpg') }}" class="d-block w-100" alt="foto-tanjiro-demon-slayer">
-            </div>
-            <div class="carousel-item">
-                <img src="{{ asset('upload/foto-tanjiro-demon-slayer.jpg') }}" class="d-block w-100" alt="tanjiro">
-            </div>
-            <div class="carousel-item">
-                <img src="{{ asset('upload/kamadotanjirosdrftgkamadotanjiro1660x400.jpg') }}" class="d-block w-100" alt="kamado">
-            </div>
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
-    </div>
-
-    <!-- Gallery Section -->
-    <h2 class="mt-3 mb-2 m-sm-2">Gallery</h2>
-    <div class="d-flex flex-wrap">
-        <img src="https://divedigital.id/wp-content/uploads/2022/06/foto-tanjiro-demon-slayer.jpg" class="m-2 img-fluid category-1" alt="..." style="height: 200px;" data-category="1">
-        <img src="https://divedigital.id/wp-content/uploads/2022/06/foto-tanjiro-demon-slayer.jpg" class="m-2 img-fluid category-2" alt="..." style="height: 200px;" data-category="2">
-        <img src="https://divedigital.id/wp-content/uploads/2022/06/foto-tanjiro-demon-slayer.jpg" class="m-2 img-fluid category-1" alt="..." style="height: 200px;" data-category="1">
-        <img src="https://divedigital.id/wp-content/uploads/2022/06/foto-tanjiro-demon-slayer.jpg" class="m-2 img-fluid category-2" alt="..." style="height: 200px;" data-category="2">
-        <img src="https://divedigital.id/wp-content/uploads/2022/06/foto-tanjiro-demon-slayer.jpg" class="m-2 img-fluid category-1" alt="..." style="height: 200px;" data-category="1">
-    </div>
-</div>
-<!-- /.container-fluid -->
 
 @endsection
+
+@push('scripts')
+    <script>
+        function submitForm() {
+            let form = document.getElementById('product-form');
+            let data = new FormData(form);
+
+    $.ajax({
+        url: "{{ route('products.store') }}",
+        type: 'POST',
+        data: data,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+            $('#exampleModal').modal('hide'); // Menutup modal
+            window.location.reload(); // Reload halaman setelah sukses
+        },
+        error: function(response) {
+            console.error(response.responseText); // Menampilkan detail error di console
+
+            // Mengambil pesan kesalahan dari respons, jika ada
+            let errorMessage = 'Gagal menyimpan produk';
+            if (response.responseJSON && response.responseJSON.message) {
+                errorMessage = response.responseJSON.message; // Menggunakan pesan kesalahan dari respons
+            }
+
+            alert(errorMessage); // Menampilkan pesan kesalahan kepada pengguna
+            }
+        });
+    }
+    </script>
+@endpush

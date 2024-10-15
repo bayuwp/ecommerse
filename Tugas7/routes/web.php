@@ -7,6 +7,10 @@ use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\TransaksiController;
+use App\Models\Kategori;
 
 
 
@@ -43,6 +47,17 @@ Route::prefix('dashboard')->middleware(['auth'])->name('dashboard.')->group(func
     Route::redirect('/test', '/dashboard/products');
 });
 
+Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () {
+    Route::get('produk', [ProductController::class, 'index'])->name('produk.index');
+});
+
+
+// Route::prefix('admin')->middleware(['app'])->group(function () {
+//     Route::resource('products', ProductController::class)->only([
+//         'index', 'store', 'destroy'
+//     ])->names('products');
+// });
+
 Route::resource('home', App\Http\Controllers\HomeController::class);
 Route::resource('products', App\Http\Controllers\ProductController::class);
 Route::resource('contact', App\Http\Controllers\ContactController::class);
@@ -56,7 +71,7 @@ Route::prefix('admin')->group(function () {
 Route::get('/parse-data/{nama_lengkap}/{email}/{jenis_kelamin}',
     [App\Http\Controllers\ParsingDataController::class, 'parseData']);
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+// Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::get('/admin/kategori', [AdminController::class, 'kategori'])->name('admin.kategori');
 Route::get('/admin/produk', [AdminController::class, 'produk'])->name('admin.produk');
@@ -93,6 +108,15 @@ Route::post('/logout', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/produk', [ProductController::class, 'index'])->name('produk.index');
 });
+
+Route::resource('products', ProductController::class);
+
+Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
+
+Route::resource('produk', ProductController::class);
+Route::resource('kategori', KategoriController::class);
+Route::resource('transaksi', TransaksiController::class);
 
 // Auth::routes();
 

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>{{ $title ?? 'Admin Dashboard' }}</title>
-    <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
+    <title>{{ $title ?? 'bayu' }}</title>
+    <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/sb-admin-2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
@@ -41,7 +41,8 @@
     integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
     crossorigin="anonymous"></script>
     <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
-    <script src="{{ asset('js/script.js') }}"></script>
+    <script src="{{ asset('js/scriptn.js') }}"></script>
 
+    @stack('scripts')
 </body>
 </html>

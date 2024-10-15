@@ -13,6 +13,8 @@
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('libs/fontawesome-free/css/all.min.css')}}">
     <link rel="stylesheet" href="{{ asset('css/sb-admin-2.min.css')}}">
 

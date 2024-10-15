@@ -58,7 +58,7 @@
             @enderror
         </div>
 
-        <p>Click here for <a href="/registration">Sign Up</a></p>
+        <p>Click here for <a href="{{ route('register') }}">Sign Up</a></p>
 
         <button type="submit" class="btn btn-primary w-100 mt-3">
             Login
