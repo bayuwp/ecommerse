@@ -4,19 +4,28 @@
     <p>Body Products</p>
 
     <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-        Launch demo modal
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" onclick="resetForm()">
+        Tambah Produk
     </button>
 
     <div id="product-list" class="row mt-3">
         @foreach($products as $product)
             <div class="card" style="width: 18rem; margin: 10px;">
-                <img src="{{ $product->foto_produk }}" class="card-img-top" alt="{{ $product->nama }}">
+                <img src="{{ asset('storage/' . $product->foto_produk) }}" class="card-img-top" alt="{{ $product->nama }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ $product->nama }}</h5>
                     <p class="card-text">{{ $product->deskripsi }}</p>
-                    <p class="card-text">{{ $product->harga }}</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                    <p class="card-text">Rp {{ number_format($product->harga, 2, ',', '.') }}</p>
+
+                    <!-- Button Edit -->
+                    <a href="#" class="btn btn-primary" onclick="editProduct({{ $product->toJson() }})" data-toggle="modal" data-target="#exampleModal">Edit</a>
+
+                    <!-- Button Delete -->
+                    <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display: inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Yakin ingin menghapus produk ini?')">Delete</button>
+                    </form>
                 </div>
             </div>
         @endforeach
@@ -56,7 +65,6 @@
                         <label for="product-photo" class="col-form-label">Foto Produk:</label>
                         <input type="file" class="form-control" id="product-photo" name="foto_produk" accept="image/jpeg, image/png, image/gif">
 
-
                         <!-- Deskripsi Produk -->
                         <label for="product-description" class="col-form-label">Deskripsi Produk:</label>
                         <textarea class="form-control" id="product-description" name="deskripsi" rows="3"></textarea>
@@ -77,29 +85,56 @@
         function submitForm() {
             let form = document.getElementById('product-form');
             let data = new FormData(form);
+            let actionUrl = form.getAttribute('action') || "{{ route('products.store') }}";
 
-    $.ajax({
-        url: "{{ route('products.store') }}",
-        type: 'POST',
-        data: data,
-        contentType: false,
-        processData: false,
-        success: function(response) {
-            $('#exampleModal').modal('hide'); // Menutup modal
-            window.location.reload(); // Reload halaman setelah sukses
-        },
-        error: function(response) {
-            console.error(response.responseText); // Menampilkan detail error di console
+            $.ajax({
+                url: actionUrl,
+                type: form.getAttribute('method') || 'POST',
+                data: data,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    $('#exampleModal').modal('hide');
+                    window.location.reload();
+                },
+                error: function(response) {
+                    console.error(response.responseText);
+                    let errorMessage = 'Gagal menyimpan produk';
+                    if (response.responseJSON && response.responseJSON.message) {
+                        errorMessage = response.responseJSON.message;
+                    }
+                    alert(errorMessage);
+                }
+            });
+        }
 
-            // Mengambil pesan kesalahan dari respons, jika ada
-            let errorMessage = 'Gagal menyimpan produk';
-            if (response.responseJSON && response.responseJSON.message) {
-                errorMessage = response.responseJSON.message; // Menggunakan pesan kesalahan dari respons
-            }
+        function editProduct(product) {
+            document.getElementById('exampleModalLabel').innerText = 'Edit Produk';
+            document.getElementById('product-form').action = `/products/${product.id}`;
+            document.getElementById('product-form').method = 'POST';
+            document.getElementById('product-form').innerHTML += '<input type="hidden" name="_method" value="PUT">';
 
-            alert(errorMessage); // Menampilkan pesan kesalahan kepada pengguna
-            }
+            document.getElementById('kategori').value = product.kategori_id;
+            document.getElementById('product-name').value = product.nama;
+            document.getElementById('product-price').value = product.harga;
+            document.getElementById('product-description').value = product.deskripsi;
+            document.getElementById('product-photo').value = ''; // Reset file input
+        }
+
+        function resetForm() {
+            document.getElementById('exampleModalLabel').innerText = 'Tambah Produk';
+            document.getElementById('product-form').action = "{{ route('products.store') }}";
+            document.getElementById('product-form').method = 'POST';
+            document.querySelector('input[name="_method"]')?.remove();
+            document.getElementById('kategori').value = '';
+            document.getElementById('product-name').value = '';
+            document.getElementById('product-price').value = '';
+            document.getElementById('product-description').value = '';
+            document.getElementById('product-photo').value = '';
+        }
+
+        $('#exampleModal').on('hidden.bs.modal', function () {
+            resetForm();
         });
-    }
     </script>
 @endpush

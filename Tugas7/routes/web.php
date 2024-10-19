@@ -10,6 +10,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\PelangganController;
 use App\Models\Kategori;
 
 
@@ -27,13 +28,30 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::middleware(['check.auth'])->group(function () {
+
+    // Rute untuk admin
+    Route::prefix('admin')->group(function () {
+        Route::get('/produk', [ProductController::class, 'index'])->name('admin.produk.index');
+        Route::post('/produk', [ProductController::class, 'store'])->name('admin.produk.store');
+        Route::get('/produk/{id}', [ProductController::class, 'show'])->name('admin.produk.show');
+
+        Route::get('/kategori', [CategoryController::class, 'index'])->name('admin.kategori.index');
+        Route::post('/kategori', [CategoryController::class, 'store'])->name('admin.kategori.store');
+        Route::get('/kategori/{id}', [CategoryController::class, 'show'])->name('admin.kategori.show');
+
+        Route::get('/transaksi', [TransactionController::class, 'index'])->name('admin.transaksi.index');
+        Route::post('/transaksi', [TransactionController::class, 'store'])->name('admin.transaksi.store');
+        Route::get('/transaksi/{id}', [TransactionController::class, 'show'])->name('admin.transaksi.show');
+    });
+});
+// Rute Dashboard
+Route::middleware(['check.auth'])->get('/', function () {
     return view('dashboard.index', ['title' => 'Dasboard']);
 })->name('dashboard');
-
-// Route::get('/products', function () {
-//     return view('dashboard.product.index');
-// })->name('product.index');
+Route::get('/', function () {
+    return view('dashboard.index', ['title' => 'Dasboard']);
+})->name('dashboard')->middleware('checkregistration');;
 
 Route::resource('products', ProductController::class)->only([
     'index', 'store', 'destroy'
@@ -58,6 +76,10 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
 //     ])->names('products');
 // });
 
+Route::get('/home', function () {
+    return redirect()->route('admin.produk.index'); // Mengarahkan ke halaman produk
+})->name('home');
+
 Route::resource('home', App\Http\Controllers\HomeController::class);
 Route::resource('products', App\Http\Controllers\ProductController::class);
 Route::resource('contact', App\Http\Controllers\ContactController::class);
@@ -74,37 +96,35 @@ Route::get('/parse-data/{nama_lengkap}/{email}/{jenis_kelamin}',
 // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::get('/admin/kategori', [AdminController::class, 'kategori'])->name('admin.kategori');
-Route::get('/admin/produk', [AdminController::class, 'produk'])->name('admin.produk');
-Route::get('/admin/transaksi', [AdminController::class, 'transaksi'])->name('admin.transaksi');
+Route::get('/admin/produk', [ProductController::class, 'index'])->name('admin.produk');
+Route::get('/admin/transaksi', [TransactionController::class, 'index'])->name('admin.transaksi');
 
 
 Route::get('/produk', [ProductController::class, 'index'])->name('produk.index');
 Route::get('/transaksi', [TransactionController::class, 'index'])->name('transaksi.index');
-Route::get('/kategori', [CategoryController::class, 'index'])->name('kategori.index');
+Route::get('/categories', [KategoriController::class, 'index'])->name('categories.index');
 
 Route::get('/app', function () {
-    return view('layouts.app'); // Ganti dengan tampilan yang sesuai
+    return view('layouts.app');
 })->name('app');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['check.auth'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
 });
 
-// Route untuk menampilkan halaman login
-// Route::get('/login', [LoginController::class, 'index'])->name('login');
-// Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest');
-Route::post('/login', [LoginController::class, 'login'])->name('login.post');
-Route::post('/', [LoginController::class, 'authenticate']);
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+    Route::post('/', [LoginController::class, 'authenticate']);
+});
 
-// Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
 Route::post('/logout', function () {
-    Auth::logout(); // Logout user
+    Auth::logout();
     return redirect('/login')->with('status', 'You have been logged out.'); // Redirect ke halaman login
 })->name('logout');
 
-// Halaman produk dengan proteksi login
 Route::middleware(['auth'])->group(function () {
     Route::get('/produk', [ProductController::class, 'index'])->name('produk.index');
 });
@@ -115,8 +135,32 @@ Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->na
 Route::post('/register', [RegisterController::class, 'register']);
 
 Route::resource('produk', ProductController::class);
-Route::resource('kategori', KategoriController::class);
+Route::resource('categories', KategoriController::class);
 Route::resource('transaksi', TransaksiController::class);
+
+
+Route::post('/kategori/store', [KategoriController::class, 'store'])->name('kategori.store');
+Route::get('/categories', [KategoriController::class, 'index'])->name('categories.index');
+Route::post('/categories', [KategoriController::class, 'store'])->name('categories.store');
+Route::get('categories/{id}/edit', [KategoriController::class, 'edit'])->name('categories.edit');
+Route::put('/categories/{id}', [KategoriController::class, 'update'])->name('categories.update');
+Route::delete('/categories/{id}', [KategoriController::class, 'destroy'])->name('categories.destroy');
+Route::resource('categories', KategoriController::class)->except(['show']);
+
+Route::middleware(['check.auth'])->group(function () {
+    Route::get('/admin/pelanggan', [PelangganController::class, 'index'])->name('admin.pelanggan');
+    Route::post('/admin/pelanggan', [PelangganController::class, 'store'])->name('admin.pelanggan.store');
+    Route::post('/pelanggan/store', [PelangganController::class, 'store'])->name('pelanggan.store');
+    Route::get('/admin/pelanggan/{id}/edit', [PelangganController::class, 'edit'])->name('admin.pelanggan.edit');
+    Route::put('/admin/pelanggan/{pelanggan}', [PelangganController::class, 'update'])->name('admin.pelanggan.update');
+    Route::delete('/admin/pelanggan/{pelanggan}', [PelangganController::class, 'destroy'])->name('admin.pelanggan.destroy');
+});
+
+
+// Route::resource('admin/pelanggan', PelangganController::class);
+
+
+
 
 // Auth::routes();
 

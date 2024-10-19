@@ -20,31 +20,47 @@ class KategoriController extends Controller
     public function store(StoreRequest $request)
     {
         $validated = $request->validated();
-        Kategori::create($validated);
-        return redirect()->route('categories.index')->with('success', 'Kategori berhasil ditambahkan!');
+        $kategori = Kategori::create($validated);
+
+        if ($kategori) {
+            return redirect()->route('categories.index')->with('success', 'Kategori berhasil ditambahkan!');
+        } else {
+            return redirect()->route('categories.index')->with('error', 'Gagal menambahkan kategori.');
+        }
     }
 
-    // Menampilkan form edit kategori
+    // Menampilkan form edit kategori berdasarkan id
     public function edit($id)
     {
         $kategori = Kategori::findOrFail($id);
-        return view('pages.admin.kategori_edit', compact('kategori'));
+        $categories = Kategori::all(); // Mengambil semua kategori untuk ditampilkan di view
+        return view('pages.admin.kategori', compact('kategori', 'categories'));
     }
 
-    // Memperbarui kategori
+
+    // Memperbarui kategori berdasarkan id
     public function update(UpdateRequest $request, $id)
     {
         $validated = $request->validated();
         $kategori = Kategori::findOrFail($id);
-        $kategori->update($validated);
-        return redirect()->route('categories.index')->with('success', 'Kategori berhasil diperbarui!');
+
+        if ($kategori->update($validated)) {
+            return redirect()->route('categories.index')->with('success', 'Kategori berhasil diperbarui!');
+        } else {
+            return redirect()->route('categories.index')->with('error', 'Gagal memperbarui kategori.');
+        }
     }
 
-    // Menghapus kategori
+    // Menghapus kategori berdasarkan id
     public function destroy($id)
     {
         $kategori = Kategori::findOrFail($id);
-        $kategori->delete();
-        return redirect()->route('categories.index')->with('success', 'Kategori berhasil dihapus!');
+
+        if ($kategori->delete()) {
+            return redirect()->route('categories.index')->with('success', 'Kategori berhasil dihapus!');
+        } else {
+            return redirect()->route('categories.index')->with('error', 'Gagal menghapus kategori.');
+        }
     }
 }
+

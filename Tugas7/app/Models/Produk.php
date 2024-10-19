@@ -24,7 +24,7 @@ class Produk extends Model
      */
     public function kategori()
     {
-        return $this->belongsTo(Kategori::class, 'kategori_id'); // Menyatakan bahwa 'kategori_id' adalah foreign key
+        return $this->belongsTo(Kategori::class, 'kategori_id');
     }
 
     /**
@@ -34,6 +34,6 @@ class Produk extends Model
      */
     public function transaksi()
     {
-        return $this->hasMany(Transaksi::class, 'produk_id'); // Menyatakan bahwa 'produk_id' adalah foreign key
+        return $this->hasMany(Transaksi::class, 'produk_id');
     }
 }

@@ -43,7 +43,6 @@ class ProductController extends DashboardController
     {
     try {
         $validated = $request->validated();
-        dd($request->all());
 
         $produk = new Produk();
         $produk->kategori_id = $validated['kategori_id'];
@@ -124,15 +123,13 @@ class ProductController extends DashboardController
             $produk = Produk::findOrFail($id);
             $produk->delete();
 
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Produk berhasil dihapus',
-            ])->setStatusCode(Response::HTTP_OK);
+            if ($produk->delete()) {
+                return redirect()->route('products.index')->with('success', 'Kategori berhasil dihapus!');
+            } else {
+                return redirect()->route('products.index')->with('error', 'Gagal menghapus kategori.');
+            }
         } catch (\Throwable $th) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Gagal menghapus produk: ' . $th->getMessage(),
-            ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+            return redirect()->route('products.index')->with('error','gagal menghapus produk');
         }
     }
 }

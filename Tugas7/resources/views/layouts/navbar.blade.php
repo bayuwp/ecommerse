@@ -11,19 +11,33 @@
 
     <!-- Divider -->
     <hr class="sidebar-divider my-0">
+
+    <!-- Kategori -->
     <li class="nav-item">
         <a class="nav-link" href="{{ route('admin.kategori') }}">
             Kategori
         </a>
     </li>
+
+    <!-- Produk -->
     <li class="nav-item">
         <a class="nav-link" href="{{ route('admin.produk') }}">
             Produk
         </a>
     </li>
+
+    <!-- Transaksi -->
     <li class="nav-item">
         <a class="nav-link" href="{{ route('admin.transaksi') }}">
             Transaksi
         </a>
     </li>
+
+    <!-- Pelanggan -->
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('admin.pelanggan') }}">
+            Pelanggan
+        </a>
+    </li>
+
 </ul>
