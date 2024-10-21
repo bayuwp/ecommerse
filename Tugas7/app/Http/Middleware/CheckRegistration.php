@@ -10,7 +10,7 @@ class CheckRegistration
     public function handle($request, Closure $next)
     {
         if (!Auth::check() || !Auth::user()->registered) {
-            return redirect('register');
+            return redirect('login');
         }
 
         return $next($request);

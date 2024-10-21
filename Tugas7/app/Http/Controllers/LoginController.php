@@ -16,9 +16,12 @@ class LoginController extends Controller
      * @return \Illuminate\View\View
      */
     public function showLoginForm()
-    {
-    return view('pages.login');
+{
+    if (Auth::check()) {
+        return redirect()->route('produk'); // Ganti 'produk' dengan nama route halaman produk Anda
     }
+    return view('pages.login');
+}
 
 
     /**
@@ -28,26 +31,27 @@ class LoginController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function login(Request $request)
-    {
-        $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|string',
-        ]);
+{
+    $request->validate([
+        'username' => 'required|string',
+        'password' => 'required|string',
+    ]);
 
-        $credentials = [
-            'email' => $request->input('username'),
-            'password' => $request->input('password'),
-        ];
+    $credentials = [
+        'email' => $request->input('username'),
+        'password' => $request->input('password'),
+    ];
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/app');
-        }
-
-        return back()->withErrors([
-            'username' => 'Username atau password salah.',
-        ])->withInput();
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect()->intended('/app');
     }
+
+    return back()->withErrors([
+        'username' => 'Username atau password salah.',
+    ])->withInput();
+}
+
 
     /**
      * Fungsi logout.
@@ -58,8 +62,11 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
+
         $request->session()->invalidate();
+
         $request->session()->regenerateToken();
-        return redirect()->route('/app');
+
+        return redirect()->route('login');
     }
 }

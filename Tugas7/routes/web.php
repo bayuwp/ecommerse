@@ -112,11 +112,14 @@ Route::middleware(['check.auth'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
 });
 
-
-Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->name('login.post');
-    Route::post('/', [LoginController::class, 'authenticate']);
+
+Route::middleware('guest')->group(function () {
+
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
+    // Route::post('/', [LoginController::class, 'authenticate']);
 });
 
 
@@ -131,8 +134,7 @@ Route::middleware(['auth'])->group(function () {
 
 Route::resource('products', ProductController::class);
 
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-Route::post('/register', [RegisterController::class, 'register']);
+
 
 Route::resource('produk', ProductController::class);
 Route::resource('categories', KategoriController::class);
@@ -160,8 +162,12 @@ Route::middleware(['check.auth'])->group(function () {
 // Route::resource('admin/pelanggan', PelangganController::class);
 
 
-
+Route::get('/home', function () {
+    return view('layouts.app');
+})->name('home');
 
 // Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Auth::routes();
