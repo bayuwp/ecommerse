@@ -9,14 +9,12 @@ use App\Http\Requests\Dashboard\Kategori\UpdateRequest;
 
 class KategoriController extends Controller
 {
-    // Menampilkan daftar kategori
     public function index()
     {
         $categories = Kategori::all();
         return view('pages.admin.kategori', compact('categories'));
     }
 
-    // Menyimpan kategori baru
     public function store(StoreRequest $request)
     {
         $validated = $request->validated();
@@ -29,16 +27,14 @@ class KategoriController extends Controller
         }
     }
 
-    // Menampilkan form edit kategori berdasarkan id
     public function edit($id)
     {
         $kategori = Kategori::findOrFail($id);
-        $categories = Kategori::all(); // Mengambil semua kategori untuk ditampilkan di view
+        $categories = Kategori::all();
         return view('pages.admin.kategori', compact('kategori', 'categories'));
     }
 
 
-    // Memperbarui kategori berdasarkan id
     public function update(UpdateRequest $request, $id)
     {
         $validated = $request->validated();
@@ -51,7 +47,6 @@ class KategoriController extends Controller
         }
     }
 
-    // Menghapus kategori berdasarkan id
     public function destroy($id)
     {
         $kategori = Kategori::findOrFail($id);

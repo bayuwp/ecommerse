@@ -10,7 +10,7 @@
             </div>
         @endif
 
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#kategoriModal">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kategoriModal">
             Tambah Kategori
         </button>
 
@@ -19,12 +19,12 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="kategoriModalLabel">@isset($kategori) Edit Kategori @else Tambah Kategori @endisset</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form method="POST" action="@isset($kategori) {{ route('categories.update', $kategori->id) }} @else {{ route('categories.store') }} @endisset">
+                        <form method="POST" action="{{ isset($kategori) ? route('categories.update', $kategori->id) : route('categories.store') }}">
                             @csrf
                             @isset($kategori)
                                 @method('PUT')
@@ -47,7 +47,7 @@
                             </div>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                                 <button type="submit" class="btn btn-primary">
                                     @isset($kategori) Perbarui @else Tambah @endisset
                                 </button>
@@ -58,7 +58,7 @@
             </div>
         </div>
 
-        {{-- Daftar Kategori --}}
+
         <div class="mt-5">
             <h3>Daftar Kategori</h3>
             <table class="table table-bordered">

@@ -11,6 +11,7 @@ class StoreRequest extends FormRequest
         return [
             'nama' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
+            'kategori_id' => 'required|exists:kategories,id',
         ];
     }
 

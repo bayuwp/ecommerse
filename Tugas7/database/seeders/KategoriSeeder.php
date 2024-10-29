@@ -9,10 +9,10 @@ class KategoriSeeder extends Seeder
 {
     public function run()
     {
-        DB::table('kategoris')->insert([
-            ['nama' => 'sepatu', 'keterangan' => 'Kategori untuk semua jenis sepatu'],
-            ['nama' => 'baju', 'keterangan' => 'Kategori untuk berbagai jenis baju'],
-            ['nama' => 'celana', 'keterangan' => 'Kategori untuk berbagai jenis celana'],
-        ]);
+        $kategoris = DB::table('kategoris')->get();
+
+        foreach ($kategoris as $kategori) {
+            echo 'Nama: ' . $kategori->nama . ', Keterangan: ' . $kategori->keterangan . PHP_EOL;
+        }
     }
 }

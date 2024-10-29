@@ -11,7 +11,9 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\PelangganController;
+// use App\Http\Controllers\RajaOngkirController;
 use App\Models\Kategori;
+
 
 
 
@@ -69,7 +71,6 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
     Route::get('produk', [ProductController::class, 'index'])->name('produk.index');
 });
 
-
 // Route::prefix('admin')->middleware(['app'])->group(function () {
 //     Route::resource('products', ProductController::class)->only([
 //         'index', 'store', 'destroy'
@@ -125,7 +126,7 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', function () {
     Auth::logout();
-    return redirect('/login')->with('status', 'You have been logged out.'); // Redirect ke halaman login
+    return redirect('/login')->with('status', 'You have been logged out.');
 })->name('logout');
 
 Route::middleware(['auth'])->group(function () {

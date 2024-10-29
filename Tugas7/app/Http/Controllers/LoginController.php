@@ -18,7 +18,7 @@ class LoginController extends Controller
     public function showLoginForm()
 {
     if (Auth::check()) {
-        return redirect()->route('produk'); // Ganti 'produk' dengan nama route halaman produk Anda
+        return redirect()->route('produk');
     }
     return view('pages.login');
 }
