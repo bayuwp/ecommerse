@@ -40,7 +40,7 @@ class ProductController extends DashboardController
      * Store a newly created resource in storage.
      */
     public function store(StoreRequest $request)
-    {
+{
     try {
         $validated = $request->validated();
 
@@ -57,19 +57,16 @@ class ProductController extends DashboardController
         }
 
         $produk->save();
+        session()->flash('success', 'Produk berhasil dibuat');
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Produk berhasil dibuat',
-            'data' => $produk
-        ])->setStatusCode(Response::HTTP_CREATED);
+        return redirect()->route('products.index');
     } catch (\Throwable $th) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Gagal membuat produk: ' . $th->getMessage(),
-        ])->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+        session()->flash('error', 'Gagal membuat produk: ' . $th->getMessage());
+        return redirect()->route('products.index');
     }
-    }
+}
+
+
 
 
     public function show($id)

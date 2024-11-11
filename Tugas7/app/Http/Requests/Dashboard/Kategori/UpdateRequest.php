@@ -8,7 +8,7 @@ class UpdateRequest extends FormRequest
 {
     public function authorize()
     {
-        return true; // Ganti dengan logika otorisasi jika diperlukan
+        return true;
     }
 
     public function rules()

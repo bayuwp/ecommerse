@@ -68,15 +68,6 @@
                             <label for="origin-city" class="col-form-label">Asal Kota:</label>
                             <select class="form-control" id="origin-city" name="origin_city" required disabled>
                                 <option value="">Pilih Kota Asal</option>
-                                @if(isset($errorMessage))
-                                    <option value="" disabled>{{ $errorMessage }}</option>
-                                @elseif(isset($cities) && count($cities) > 0)
-                                    @foreach ($cities as $city)
-                                        <option value="{{ $city['city_id'] }}">{{ $city['city_name'] }}</option>
-                                    @endforeach
-                                @else
-                                    <option value="" disabled>Data kota tidak tersedia.</option>
-                                @endif
                             </select>
                         </div>
 
@@ -96,49 +87,35 @@
                         </div>
 
                         <!-- Pilih Kota Tujuan -->
-                    <div class="form-group">
-                        <label for="destination-city" class="col-form-label">Kota Tujuan:</label>
-                        <select class="form-control" id="destination-city" name="destination_city" required disabled>
-                            <option value="">Pilih Kota Tujuan</option>
-                            @if(isset($errorMessage))
-                                <option value="" disabled>{{ $errorMessage }}</option>
-                            @elseif(isset($cities) && count($cities) > 0)
-                                @foreach ($cities as $city)
-                                    <option value="{{ $city['city_id'] }}">{{ $city['city_name'] }}</option>
-                                @endforeach
-                            @else
-                                <option value="" disabled>Data kota tidak tersedia.</option>
-                            @endif
-                        </select>
-                    </div>
+                        <div class="form-group">
+                            <label for="destination-city" class="col-form-label">Tujuan Kota:</label>
+                            <select class="form-control" id="destination-city" name="destination_city" required disabled>
+                                <option value="">Pilih Kota Tujuan</option>
+                            </select>
+                        </div>
 
-
-                        <!-- Berat Produk -->
-                        <label for="weight" class="col-form-label">Berat (gram):</label>
-                        <input type="number" class="form-control" id="weight" name="weight" required>
+                        <!-- Berat Pengiriman -->
+                        <div class="form-group">
+                            <label for="weight" class="col-form-label">Berat (gram):</label>
+                            <input type="number" class="form-control" id="weight" name="weight" required min="1">
+                        </div>
 
                         <!-- Pilih Kurir -->
-                        <label for="courier" class="col-form-label">Kurir:</label>
-                        <select class="form-control" id="courier" name="courier" required>
-                            <option value="jne">JNE</option>
-                            <option value="tiki">TIKI</option>
-                            <option value="pos">POS Indonesia</option>
-                        </select>
-
-                        <!-- Pembayaran -->
-                        <label for="payment" class="col-form-label">Metode Pembayaran:</label>
-                        <select class="form-control" id="payment" name="payment" required>
-                            <option value="transfer">Transfer Bank</option>
-                            <option value="cod">Bayar di Tempat (COD)</option>
-                        </select>
+                        <div class="form-group">
+                            <label for="courier" class="col-form-label">Kurir:</label>
+                            <select class="form-control" id="courier" name="courier" required>
+                                <option value="">Pilih Kurir</option>
+                                <option value="jne">JNE</option>
+                                <option value="pos">POS Indonesia</option>
+                                <option value="tiki">Tiki</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="submitCheckout()">Proceed</button>
+                        <button type="button" class="btn btn-primary" onclick="submitCheckout()">Hitung Ongkos Kirim</button>
                     </div>
                 </form>
-                <div id="checkout-result" style="margin-top: 20px; padding: 7px;">
-                </div>
+                <div id="checkout-result"style="margin-top: 20px;" padding: 7px; ></div>
             </div>
         </div>
     </div>
@@ -154,7 +131,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form id="product-form" enctype="multipart/form-data">
+                <form id="product-form" enctype="multipart/form-data" method="POST" action="{{ route('produk.store') }}">
                     @csrf
                     <div class="modal-body">
                         <!-- Kategori -->
@@ -172,11 +149,11 @@
 
                         <!-- Harga Produk -->
                         <label for="product-price" class="col-form-label">Harga Produk:</label>
-                        <input type="number" class="form-control" id="product-price" name="harga" step="0.01" required>
+                        <input type="number" class="form-control" id="product-price" name="harga" step="0.01" required min="0">
 
                         <!-- Foto Produk -->
                         <label for="product-photo" class="col-form-label">Foto Produk:</label>
-                        <input type="file" class="form-control" id="product-photo" name="foto_produk" accept="image/jpeg, image/png, image/gif">
+                        <input type="file" class="form-control" id="product-photo" name="foto_produk" accept="image/jpeg, image/png, image/gif" required>
 
                         <!-- Deskripsi Produk -->
                         <label for="product-description" class="col-form-label">Deskripsi Produk:</label>
@@ -184,9 +161,10 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="submitForm()">Save changes</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
                     </div>
                 </form>
+
             </div>
         </div>
     </div>
@@ -196,245 +174,230 @@
 @push('scripts')
     <script>
 
-    $(document).ready(function() {
-        function getProvinces() {
-            $.ajax({
-                url: 'http://localhost:8000/api/rajaongkir/provinces',
-                method: 'GET',
-                success: function(data) {
-                    const provinces = data.rajaongkir.results;
-                    const originProvinceSelect = $('#origin-province');
-                    const destinationProvinceSelect = $('#destination-province');
+$(document).ready(function() {
+    function getProvinces() {
+        $.ajax({
+            url: 'http://localhost:8000/api/rajaongkir/provinces',
+            method: 'GET',
+            success: function(data) {
+                const provinces = data.rajaongkir.results;
+                const originProvinceSelect = $('#origin-province');
+                const destinationProvinceSelect = $('#destination-province');
 
-                    originProvinceSelect.empty();
-                    destinationProvinceSelect.empty();
+                originProvinceSelect.empty();
+                destinationProvinceSelect.empty();
 
-                    originProvinceSelect.append('<option value="">Pilih Provinsi Asal</option>');
-                    destinationProvinceSelect.append('<option value="">Pilih Provinsi Tujuan</option>');
+                originProvinceSelect.append('<option value="">Pilih Provinsi Asal</option>');
+                destinationProvinceSelect.append('<option value="">Pilih Provinsi Tujuan</option>');
 
-                    provinces.forEach(function(province) {
-                        originProvinceSelect.append('<option value="' + province.province_id + '">' + province.province + '</option>');
-                        destinationProvinceSelect.append('<option value="' + province.province_id + '">' + province.province + '</option>');
-                    });
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.error('Error fetching provinces: ' + textStatus, errorThrown);
-                    alert('Gagal mengambil data provinsi. Silakan coba lagi.');
-                }
-            });
-        }
-
-        $('#checkoutModal').on('show.bs.modal', function () {
-            document.getElementById('checkout-result').innerHTML = '';
-            document.getElementById('checkout-form').style.display = 'block';
-
-        });
-
-        $('#checkoutModal').on('hidden.bs.modal', function () {
-            document.getElementById('checkout-result').innerHTML = '';
-            document.getElementById('checkout-form').reset();
-
-            $('#origin-city').val('');
-            $('#origin-city').prop('disabled', true);
-
-            $('#destination-city').val('');
-            $('#destination-city').prop('disabled', true);
-        });
-
-        function getCitiesByProvince(provinceId, selectElement) {
-            $.ajax({
-                url: 'http://localhost:8000/api/rajaongkir/cities/' + provinceId,
-                method: 'GET',
-                success: function(data) {
-                    console.log('Data kota yang diterima:', data);
-                    const cities = data.rajaongkir.results;
-
-                    if (cities && cities.length > 0) {
-                        selectElement.empty();
-
-                        selectElement.append('<option value="">Pilih Kota</option>');
-
-                        cities.forEach(function(city) {
-                            const cityOption = '<option value="' + city.city_id + '">' + city.type + ' ' + city.city_name + '</option>';
-                            selectElement.append(cityOption);
-                        });
-
-                        selectElement.removeAttr('disabled');
-                    } else {
-                        console.log('Tidak ada kota ditemukan untuk provinsi ini.');
-                        selectElement.empty().append('<option value="">Tidak ada kota ditemukan.</option>').attr('disabled', 'disabled');
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.error('Error fetching cities: ' + textStatus, errorThrown);
-                    alert('Gagal mengambil data kota. Silakan coba lagi.');
-                }
-            });
-        }
-
-        $('#origin-province').on('change', function() {
-            let provinceId = $(this).val();
-            console.log('ID Provinsi Asal yang dipilih:', provinceId);
-
-            if (provinceId) {
-                getCitiesByProvince(provinceId, $('#origin-city'));
-            } else {
-                $('#origin-city').empty().append('<option value="">Pilih Kota Asal</option>').attr('disabled', 'disabled');
-                $('#destination-city').empty().append('<option value="">Pilih Kota Tujuan</option>').attr('disabled', 'disabled');
+                provinces.forEach(function(province) {
+                    originProvinceSelect.append('<option value="' + province.province_id + '">' + province.province + '</option>');
+                    destinationProvinceSelect.append('<option value="' + province.province_id + '">' + province.province + '</option>');
+                });
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Error fetching provinces: ' + textStatus, errorThrown);
+                alert('Gagal mengambil data provinsi. Silakan coba lagi.');
             }
         });
+    }
 
-        $('#destination-province').on('change', function() {
-            let provinceId = $(this).val();
-            console.log('ID Provinsi Tujuan yang dipilih:', provinceId);
-
-            if (provinceId) {
-                getCitiesByProvince(provinceId, $('#destination-city'));
-            } else {
-                $('#destination-city').empty().append('<option value="">Pilih Kota Tujuan</option>').attr('disabled', 'disabled');
-            }
-        });
-
-        getProvinces();
+    $('#checkoutModal').on('show.bs.modal', function() {
+        document.getElementById('checkout-result').innerHTML = '';
+        document.getElementById('checkout-form').style.display = 'block';
     });
 
-    function submitCheckout() {
-        let form = document.getElementById('checkout-form');
-        let data = new FormData(form);
+    $('#checkoutModal').on('hidden.bs.modal', function() {
+        document.getElementById('checkout-result').innerHTML = '';
+        document.getElementById('checkout-form').reset();
 
-        let originCity = data.get('origin_city');
-        let destinationCity = data.get('destination_city');
-        let weight = data.get('weight');
-        let courier = data.get('courier');
+        $('#origin-city').val('');
+        $('#origin-city').prop('disabled', true);
 
-        if (!originCity || !destinationCity || !weight || !courier) {
-            alert('Harap lengkapi semua field sebelum melanjutkan.');
-            return;
-        }
+        $('#destination-city').val('');
+        $('#destination-city').prop('disabled', true);
+    });
 
+    function getCitiesByProvince(provinceId, selectElement) {
         $.ajax({
-            url: "{{ route('calculateShipping') }}",
-            type: 'POST',
-            data: {
-                _token: "{{ csrf_token() }}",
-                origin: originCity,
-                destination: destinationCity,
-                weight: weight,
-                courier: courier
-            },
-            success: function(response) {
-                console.log(response);
+            url: 'http://localhost:8000/api/rajaongkir/cities/' + provinceId,
+            method: 'GET',
+            success: function(data) {
+                const cities = data.rajaongkir.results;
 
-                if (response.status === 'success') {
-                    document.getElementById('checkout-form').style.display = 'none';
-                    showResultForm(response.data);
+                if (cities && cities.length > 0) {
+                    selectElement.empty();
+                    selectElement.append('<option value="">Pilih Kota</option>');
+
+                    cities.forEach(function(city) {
+                        selectElement.append('<option value="' + city.city_id + '">' + city.type + ' ' + city.city_name + '</option>');
+                    });
+
+                    selectElement.removeAttr('disabled');
                 } else {
-                    alert('Gagal mendapatkan ongkos kirim: ' + response.message);
+                    selectElement.empty().append('<option value="">Tidak ada kota ditemukan.</option>').attr('disabled', 'disabled');
                 }
             },
-            error: function(xhr) {
-                console.error(xhr);
-                alert('Terjadi kesalahan saat memproses checkout');
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Error fetching cities: ' + textStatus, errorThrown);
+                alert('Gagal mengambil data kota. Silakan coba lagi.');
             }
         });
     }
 
-    function showResultForm(data) {
-        let container = document.getElementById('checkout-result');
-        container.innerHTML = '';
+    $('#origin-province').on('change', function() {
+        let provinceId = $(this).val();
 
-        let formElement = document.createElement('form');
-        formElement.setAttribute('id', 'result-form');
-        formElement.style.padding = '7px';
+        if (provinceId) {
+            getCitiesByProvince(provinceId, $('#origin-city'));
+        } else {
+            $('#origin-city').empty().append('<option value="">Pilih Kota Asal</option>').attr('disabled', 'disabled');
+            $('#destination-city').empty().append('<option value="">Pilih Kota Tujuan</option>').attr('disabled', 'disabled');
+        }
+    });
 
-        data.forEach(courier => {
-            let courierName = courier.name;
-            let costs = courier.costs;
+    $('#destination-province').on('change', function() {
+        let provinceId = $(this).val();
 
-            let courierElement = document.createElement('div');
-            courierElement.innerHTML = `<h4>${courierName}</h4>`;
+        if (provinceId) {
+            getCitiesByProvince(provinceId, $('#destination-city'));
+        } else {
+            $('#destination-city').empty().append('<option value="">Pilih Kota Tujuan</option>').attr('disabled', 'disabled');
+        }
+    });
 
-            costs.forEach((costOption, index) => {
-                let service = costOption.service;
-                let description = costOption.description;
-                let cost = costOption.cost[0].value;
-                let etd = costOption.cost[0].etd;
+    getProvinces();
+});
 
-                let radioInput =
-                    `<div class="form-check">
-                        <input class="form-check-input" type="radio" name="shipping_option" id="shipping_${index}" value="${cost}">
-                        <label class="form-check-label" for="shipping_${index}">
-                            ${service} (${description}) - Harga: Rp ${cost} - Estimasi: ${etd} hari
-                        </label>
-                    </div>`;
+function submitCheckout() {
+    let form = document.getElementById('checkout-form');
+    let data = new FormData(form);
 
-                courierElement.innerHTML += radioInput;
-            });
+    if (!data.get('origin_city') || !data.get('destination_city') || !data.get('weight') || !data.get('courier')) {
+        alert('Harap lengkapi semua field sebelum melanjutkan.');
+        return;
+    }
 
-            formElement.appendChild(courierElement);
+    $.ajax({
+        url: "{{ route('calculateShipping') }}",
+        type: 'POST',
+        data: {
+            _token: "{{ csrf_token() }}",
+            origin: data.get('origin_city'),
+            destination: data.get('destination_city'),
+            weight: data.get('weight'),
+            courier: data.get('courier')
+        },
+        success: function(response) {
+            if (response.status === 'success') {
+                document.getElementById('checkout-form').style.display = 'none';
+                showResultForm(response.data);
+            } else {
+                alert('Gagal mendapatkan ongkos kirim: ' + response.message);
+            }
+        },
+        error: function(xhr) {
+            console.error(xhr);
+            alert('Terjadi kesalahan saat memproses checkout');
+        }
+    });
+}
+
+function showResultForm(data) {
+    let container = document.getElementById('checkout-result');
+    container.innerHTML = '';
+
+    let formElement = document.createElement('form');
+    formElement.setAttribute('id', 'result-form');
+    formElement.style.padding = '7px';
+
+    data.forEach((courier, courierIndex) => {
+        let courierElement = document.createElement('div');
+        courierElement.innerHTML = `<h4>${courier.name}</h4>`;
+
+        courier.costs.forEach((costOption, index) => {
+            courierElement.innerHTML += `
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="shipping_option" id="shipping_${courierIndex}_${index}" value="${costOption.cost[0].value}">
+                    <label class="form-check-label" for="shipping_${courierIndex}_${index}">
+                        ${costOption.service} (${costOption.description}) - Harga: Rp ${costOption.cost[0].value} - Estimasi: ${costOption.cost[0].etd} hari
+                    </label>
+                </div>`;
         });
 
-        let submitButtonContainer = document.createElement('div');
-        submitButtonContainer.style.display = 'flex';
-        submitButtonContainer.style.justifyContent = 'flex-end';
-        submitButtonContainer.style.marginTop = '1rem';
+        formElement.appendChild(courierElement);
+    });
 
-        let submitButton = document.createElement('button');
-        submitButton.setAttribute('type', 'button');
-        submitButton.setAttribute('class', 'btn btn-primary');
-        submitButton.innerHTML = 'Lanjutkan ke Pembayaran';
-        submitButton.onclick = function() {
-            processPayment();
-        };
+    let submitButtonContainer = document.createElement('div');
+    submitButtonContainer.classList.add('d-flex', 'justify-content-end', 'mt-2');
 
-        submitButtonContainer.appendChild(submitButton);
-        formElement.appendChild(submitButtonContainer);
+    let submitButton = document.createElement('button');
+    submitButton.type = 'button';
+    submitButton.className = 'btn btn-primary';
+    submitButton.innerHTML = 'Lanjutkan ke Pembayaran';
+    submitButton.onclick = processPayment;
 
-        container.appendChild(formElement);
+    submitButtonContainer.appendChild(submitButton);
+    formElement.appendChild(submitButtonContainer);
+    container.appendChild(formElement);
+}
+
+function processPayment() {
+    let selectedShippingOption = document.querySelector('input[name="shipping_option"]:checked');
+    if (!selectedShippingOption) {
+        alert("Pilih opsi pengiriman terlebih dahulu.");
+        return;
     }
 
-    function processPayment() {
-        let selectedOption = document.querySelector('input[name="shipping_option"]:checked');
-        if (!selectedOption) {
-            alert('Harap pilih salah satu opsi pengiriman.');
-            return;
+    let selectedProductId = 12;
+    console.log("Selected Product ID:", selectedProductId);
+
+    let data = {
+        _token: "{{ csrf_token() }}",
+        pelanggan_id: {{ auth()->user()->id }},
+        produk_id: selectedProductId,
+        shipping_cost: selectedShippingOption.value,
+        shipping_service: selectedShippingOption.nextElementSibling ? selectedShippingOption.nextElementSibling.innerText : ''
+    };
+
+    $.ajax({
+        url: "{{ route('checkout.saveTransaction') }}",
+        type: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+        },
+        data: data,
+        success: function(response) {
+            if (response.status === 'success') {
+                window.location.href = "{{ route('transaksi.index') }}";
+            } else {
+                alert('Gagal menyimpan data transaksi: ' + response.message);
+            }
+        },
+        error: function(xhr) {
+            console.error(xhr);
+            alert('Terjadi kesalahan saat memproses transaksi. Silakan coba lagi.');
         }
-
-        let shippingCost = selectedOption.value;
-        let paymentMethod = document.getElementById('payment-method').value;
-
-        if (!paymentMethod) {
-            alert('Harap pilih metode pembayaran.');
-            return;
-        }
-
-        alert('Pembayaran dengan metode ' + paymentMethod + ' dan biaya pengiriman Rp ' + shippingCost);
-    }
-
+    });
+    showResultForm(data);
+}
 
     function submitForm() {
         let form = document.getElementById('product-form');
         let data = new FormData(form);
-        console.log([...data]);
-
-        let actionUrl = form.getAttribute('action') || "{{ route('products.store') }}";
 
         $.ajax({
-            url: actionUrl,
+            url: form.getAttribute('action') || "{{ route('products.store') }}",
             type: form.getAttribute('method') || 'POST',
             data: data,
             contentType: false,
             processData: false,
-            success: function(response) {
+            success: function() {
                 $('#exampleModal').modal('hide');
                 window.location.reload();
             },
             error: function(response) {
-                console.error(response.responseText);
-                let errorMessage = 'Gagal menyimpan produk';
-                if (response.responseJSON && response.responseJSON.message) {
-                    errorMessage = response.responseJSON.message;
-                }
+                let errorMessage = response.responseJSON?.message || 'Gagal menyimpan produk';
                 alert(errorMessage);
             }
         });

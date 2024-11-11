@@ -10,18 +10,19 @@ class Transaksi extends Model
     use HasFactory;
 
     // Menentukan nama tabel di database
-    protected $table = 'transaksi';
+    protected $table = 'transactions'; // Pastikan nama tabel sesuai dengan migrasi
 
     // Menentukan kolom yang dapat diisi
     protected $fillable = [
-        'pelanggan_id',
-        'total_harga',
-        'produk_id',
-        'deskripsi',
-        'nomer_invoice',
-        'status_pembayaran',
-        'tanggal_pembelian',
-        'tanggal_pembayaran',
+        'transaction_id',
+        'order_id',
+        'payment_type',
+        'gross_amount',
+        'transaction_time',
+        'transaction_status',
+        'metadata',
+        'pelanggan_id', // Tambahkan ini
+        'produk_id',    // Tambahkan ini
     ];
 
     /**
@@ -31,7 +32,7 @@ class Transaksi extends Model
      */
     public function pelanggan()
     {
-        return $this->belongsTo(Pelanggan::class, 'pelanggan_id'); // Menyatakan bahwa 'pelanggan_id' adalah foreign key
+        return $this->belongsTo(Pelanggan::class, 'pelanggan_id'); // Ganti dengan kolom foreign key yang sesuai jika ada
     }
 
     /**
@@ -41,6 +42,6 @@ class Transaksi extends Model
      */
     public function produk()
     {
-        return $this->belongsTo(Produk::class, 'produk_id'); // Menyatakan bahwa 'produk_id' adalah foreign key
+        return $this->belongsTo(Produk::class, 'produk_id'); // Ganti dengan kolom foreign key yang sesuai jika ada
     }
 }

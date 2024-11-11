@@ -11,7 +11,7 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\PelangganController;
-// use App\Http\Controllers\RajaOngkirController;
+use App\Http\Controllers\CheckoutController;
 use App\Models\Kategori;
 
 
@@ -47,6 +47,18 @@ Route::middleware(['check.auth'])->group(function () {
         Route::get('/transaksi/{id}', [TransactionController::class, 'show'])->name('admin.transaksi.show');
     });
 });
+
+Route::post('/checkout/get-token', [CheckoutController::class, 'getToken'])->name('checkout.getToken');
+Route::get('/admin/transaksi', [TransactionController::class, 'index'])->name('transaction.page');
+Route::post('/checkout/save', [CheckoutController::class, 'save'])->name('checkout.save');
+Route::post('/checkout/save', [TransaksiController::class, 'store'])->name('checkout.save');
+Route::post('/transaction/store', [TransactionController::class, 'store'])->name('transaction.store');
+Route::post('/checkout/save-transaction', [CheckoutController::class, 'saveTransaction'])->name('checkout.saveTransaction');
+Route::post('/create-transaction', [TransactionController::class, 'createTransaction']);
+Route::delete('/transactions/{orderId}', [TransactionController::class, 'deleteTransaction'])->name('transactions.delete');
+Route::get('/transaksi', [TransactionController::class, 'index'])->name('transaksi.index');
+
+
 // Rute Dashboard
 Route::middleware(['check.auth'])->get('/', function () {
     return view('dashboard.index', ['title' => 'Dasboard']);
