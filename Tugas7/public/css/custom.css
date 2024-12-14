@@ -1,0 +1,125 @@
+/* Menjaga navbar tetap responsif */
+.navbar {
+    position: relative;
+}
+
+/* Navbar brand di kiri */
+.navbar-brand {
+    position: absolute;
+    left: 0;
+}
+
+/* Form pencarian di tengah */
+.navbar .d-flex.mx-auto {
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+/* Navbar items di kanan */
+.navbar-nav {
+    margin-left: auto;
+}
+
+/* Tweak dropdown untuk penempatan profile */
+.navbar-nav .dropdown-menu-end {
+    right: 0;
+    left: auto;
+}
+
+/* Styling tambahan untuk navbar, jika diperlukan */
+.navbar-light .navbar-nav .nav-link {
+    color: #5a5a5a;
+}
+
+.navbar-light .navbar-nav .nav-link:hover {
+    color: #007bff;
+}
+
+.navbar-light .navbar-toggler-icon {
+    background-color: #007bff;
+}
+
+.navbar-light .navbar-nav .dropdown-item {
+    color: #5a5a5a;
+}
+
+.navbar-light .navbar-nav .dropdown-item:hover {
+    color: #007bff;
+}
+
+
+/* Styles for Carousel */
+.carousel-inner img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+/* Product Card */
+.product-card {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    padding: 10px;
+    text-align: center;
+}
+
+.product-card img {
+    max-height: 200px;
+    object-fit: cover;
+}
+
+.product-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.product-price {
+    font-size: 1rem;
+    color: #28a745;
+    margin-top: 5px;
+}
+
+/* Section Title */
+.section-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+/* Category Link */
+.category-link {
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #007bff;
+}
+
+.category-link:hover {
+    text-decoration: underline;
+}
+
+/* Cart Counter */
+.nav-link {
+    position: relative;
+}
+
+.nav-link .cart-counter {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 50%;
+}
+
+/* Footer */
+footer {
+    background-color: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    margin-top: 50px;
+}
