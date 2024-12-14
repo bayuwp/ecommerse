@@ -12,6 +12,11 @@ use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\KategoriUserController;
+use App\Http\Controllers\UserControllerProduct;
 use App\Models\Kategori;
 
 
@@ -31,6 +36,30 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware(['check.auth'])->group(function () {
+
+    Route::get('/carts', [CartController::class, 'index'])->name('carts.index');
+    Route::post('/carts/add', [CartController::class, 'addToCart'])->name('carts.add');
+    Route::post('/carts/remove', [CartController::class, 'removeFromCart'])->name('carts.remove');
+    Route::get('/carts/checkout', [CartController::class, 'checkout'])->name('carts.checkout');
+
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+
+        // Rute untuk menampilkan produk berdasarkan kategori
+    Route::get('/produk/kategori/{id}', [UserControllerProduct::class, 'byKategori'])->name('produk.byKategori');
+
+    Route::get('/kategori/{id}', [KategoriUserController::class, 'show'])->name('kategori.show');
+
+    // Rute untuk menampilkan detail produk
+    Route::get('/produk/{id}', [UserControllerProduct::class, 'show'])->name('produk.show');
+    Route::get('/produk/{id}', [UserControllerProduct::class, 'detail'])->name('produk.detail');
+    Route::get('/navbar', [HomeController::class, 'index'])->name('navbar');
+
+
+    Route::get('/search', [ProductController::class, 'search'])->name('search');
+
+    // Route untuk menampilkan produk berdasarkan kategori
+    Route::get('/produk/kategori/{id}', [UserControllerProduct::class, 'byKategori'])->name('produk.byKategori');
+
 
     // Rute untuk admin
     Route::prefix('admin')->group(function () {
@@ -83,15 +112,12 @@ Route::prefix('admin')->middleware(['auth'])->name('admin.')->group(function () 
     Route::get('produk', [ProductController::class, 'index'])->name('produk.index');
 });
 
-// Route::prefix('admin')->middleware(['app'])->group(function () {
-//     Route::resource('products', ProductController::class)->only([
-//         'index', 'store', 'destroy'
-//     ])->names('products');
-// });
+Route::prefix('admin')->middleware(['app'])->group(function () {
+    Route::resource('products', ProductController::class)->only([
+        'index', 'store', 'destroy'
+    ])->names('products');
+});
 
-Route::get('/home', function () {
-    return redirect()->route('admin.produk.index'); // Mengarahkan ke halaman produk
-})->name('home');
 
 Route::resource('home', App\Http\Controllers\HomeController::class);
 Route::resource('products', App\Http\Controllers\ProductController::class);
@@ -161,6 +187,10 @@ Route::get('categories/{id}/edit', [KategoriController::class, 'edit'])->name('c
 Route::put('/categories/{id}', [KategoriController::class, 'update'])->name('categories.update');
 Route::delete('/categories/{id}', [KategoriController::class, 'destroy'])->name('categories.destroy');
 Route::resource('categories', KategoriController::class)->except(['show']);
+// Route::get('/produk/kategori/{id}', [ProductController::class, 'showByKategori'])->name('produk.byKategori');
+Route::get('/kategori', [KategoriUserController::class, 'index'])->name('kategori.index');
+Route::get('/kategori', [KategoriUserController::class, 'showByCategory'])->name('kategori.showByCategory');
+
 
 Route::middleware(['check.auth'])->group(function () {
     Route::get('/admin/pelanggan', [PelangganController::class, 'index'])->name('admin.pelanggan');
@@ -175,9 +205,9 @@ Route::middleware(['check.auth'])->group(function () {
 // Route::resource('admin/pelanggan', PelangganController::class);
 
 
-Route::get('/home', function () {
-    return view('layouts.app');
-})->name('home');
+// Route::get('/home', function () {
+//     return view('layouts.app');
+// })->name('home');
 
 // Auth::routes();
 

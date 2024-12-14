@@ -37,7 +37,7 @@ class ProdukController extends Controller
 
     public function show($id)
     {
-        $produk = Produk::with('kategori')->findOrFail($id); // Mengaitkan kategori
+        $produk = Produk::with('kategori')->findOrFail($id);
         return response()->json($produk);
     }
 

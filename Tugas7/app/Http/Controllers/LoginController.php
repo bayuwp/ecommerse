@@ -16,13 +16,12 @@ class LoginController extends Controller
      * @return \Illuminate\View\View
      */
     public function showLoginForm()
-{
-    if (Auth::check()) {
-        return redirect()->route('produk');
+    {
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+        return view('pages.login');
     }
-    return view('pages.login');
-}
-
 
     /**
      * Proses login.
@@ -31,27 +30,26 @@ class LoginController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function login(Request $request)
-{
-    $request->validate([
-        'username' => 'required|string',
-        'password' => 'required|string',
-    ]);
+    {
+        $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
 
-    $credentials = [
-        'email' => $request->input('username'),
-        'password' => $request->input('password'),
-    ];
+        $credentials = [
+            'email' => $request->input('username'),
+            'password' => $request->input('password'),
+        ];
 
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-        return redirect()->intended('/app');
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->route('home'); // Arahkan ke home setelah login
+        }
+
+        return back()->withErrors([
+            'username' => 'Username atau password salah.',
+        ])->withInput();
     }
-
-    return back()->withErrors([
-        'username' => 'Username atau password salah.',
-    ])->withInput();
-}
-
 
     /**
      * Fungsi logout.
@@ -64,7 +62,6 @@ class LoginController extends Controller
         Auth::logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect()->route('login');

@@ -10,11 +10,10 @@ class CreateKategorisTable extends Migration
     {
         Schema::create('kategoris', function (Blueprint $table) {
             $table->id();
-            $table->string('nama')->unique(); // Tambahkan unique jika ingin mencegah duplikat
+            $table->string('nama')->unique();
             $table->text('keterangan')->nullable();
             $table->timestamps();
 
-            // Tambahkan indeks untuk kolom nama jika diperlukan
             $table->index('nama');
         });
     }

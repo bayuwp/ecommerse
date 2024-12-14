@@ -15,17 +15,17 @@ class KategoriController extends Controller
         return view('pages.admin.kategori', compact('categories'));
     }
 
+
     public function store(StoreRequest $request)
     {
         $validated = $request->validated();
         $kategori = Kategori::create($validated);
 
-        if ($kategori) {
-            return redirect()->route('categories.index')->with('success', 'Kategori berhasil ditambahkan!');
-        } else {
-            return redirect()->route('categories.index')->with('error', 'Gagal menambahkan kategori.');
-        }
+        return $kategori
+            ? redirect()->route('categories.index')->with('success', 'Kategori berhasil ditambahkan!')
+            : redirect()->route('categories.index')->with('error', 'Gagal menambahkan kategori.');
     }
+
 
     public function edit($id)
     {
@@ -40,11 +40,9 @@ class KategoriController extends Controller
         $validated = $request->validated();
         $kategori = Kategori::findOrFail($id);
 
-        if ($kategori->update($validated)) {
-            return redirect()->route('categories.index')->with('success', 'Kategori berhasil diperbarui!');
-        } else {
-            return redirect()->route('categories.index')->with('error', 'Gagal memperbarui kategori.');
-        }
+        return $kategori->update($validated)
+            ? redirect()->route('categories.index')->with('success', 'Kategori berhasil diperbarui!')
+            : redirect()->route('categories.index')->with('error', 'Gagal memperbarui kategori.');
     }
 
     public function destroy($id)
@@ -57,5 +55,14 @@ class KategoriController extends Controller
             return redirect()->route('categories.index')->with('error', 'Gagal menghapus kategori.');
         }
     }
+
+    public function showByKategori($id)
+    {
+        $kategori = Kategori::findOrFail($id);
+        $produk = Produk::where('kategori_id', $id)->get();
+
+        return view('produk.index', compact('kategori', 'produk'));
+    }
+
 }
 

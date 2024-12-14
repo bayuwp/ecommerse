@@ -89,4 +89,20 @@ class ProdukController extends Controller
 
         return redirect()->route('products.index')->with('success', 'Produk berhasil dihapus!');
     }
+
+    // Menampilkan produk berdasarkan kategori
+    public function showByKategori($id)
+{
+    // Fetch the selected category
+    $selectedCategory = Kategori::findOrFail($id);
+
+    // Fetch the products related to this category
+    $products = $selectedCategory->produk; // Ensure you have the correct relation set in the Kategori model
+
+    // Return the view with the selected category and the filtered products
+    return view('user.kategori', compact('selectedCategory', 'products'));
+}
+
+
+
 }

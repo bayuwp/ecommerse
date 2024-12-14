@@ -15,8 +15,8 @@ class Produk extends Model
         'harga',
         'foto_produk',
         'deskripsi',
+        'sold', // Tambahkan kolom sold
     ];
-
     /**
      * Mendefinisikan relasi banyak ke satu dengan model Kategori.
      *
@@ -37,3 +37,4 @@ class Produk extends Model
         return $this->hasMany(Transaksi::class, 'produk_id');
     }
 }
+

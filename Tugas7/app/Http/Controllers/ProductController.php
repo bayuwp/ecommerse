@@ -27,11 +27,18 @@ class ProductController extends DashboardController
 
     $products = Produk::all();
     $kategoris = Kategori::all();
-
+    // // Jika ada kategori yang dipilih, ambil produk terkait
+    // if($request->has('kategori_id')){
+    //     $selectedCategory = Kategori::find($request->kategori_id);
+    //     $products = $selectedCategory->products; // Pastikan relasi products ada pada model Kategori
+    // } else {
+    //     $products = collect(); // Jika tidak ada kategori yang dipilih, tampilkan produk kosong
+    //     $selectedCategory = null;
+    // }
     // Mengembalikan view dengan variabel yang tepat
     return view('pages.admin.produk', [
         'products' => $products,
-        'kategoris' => $kategoris, // Pastikan nama variabel konsisten
+        'kategoris' => $kategoris,
     ]);
     }
 
@@ -40,34 +47,36 @@ class ProductController extends DashboardController
      * Store a newly created resource in storage.
      */
     public function store(StoreRequest $request)
-{
-    try {
-        $validated = $request->validated();
+    {
+        try {
+            $validated = $request->validated();
 
-        $produk = new Produk();
-        $produk->kategori_id = $validated['kategori_id'];
-        $produk->nama = $validated['nama'];
-        $produk->harga = $validated['harga'];
-        $produk->deskripsi = $validated['deskripsi'];
+            $produk = new Produk;
+            $produk->kategori_id = $validated['kategori_id'];
+            $produk->nama = $validated['nama'];
+            $produk->harga = $validated['harga'];
+            $produk->deskripsi = $validated['deskripsi'];
+            $produk->sold = 0;
 
-        if ($request->hasFile('foto_produk')) {
-            $foto = $request->file('foto_produk');
-            $fotoPath = $foto->store('uploads', 'public');
-            $produk->foto_produk = $fotoPath;
+
+            if ($request->hasFile('foto_produk')) {
+                $foto = $request->file('foto_produk');
+                $fotoPath = $foto->store('uploads', 'public');
+                $produk->foto_produk = $fotoPath;
+
+            }
+            $produk->save();
+
+
+            session()->flash('success', 'Produk berhasil dibuat');
+
+            return redirect()->route('products.index');
+        } catch (\Throwable $th) {
+
+            session()->flash('error', 'Gagal membuat produk: ' . $th->getMessage());
+            return redirect()->route('products.index');
         }
-
-        $produk->save();
-        session()->flash('success', 'Produk berhasil dibuat');
-
-        return redirect()->route('products.index');
-    } catch (\Throwable $th) {
-        session()->flash('error', 'Gagal membuat produk: ' . $th->getMessage());
-        return redirect()->route('products.index');
     }
-}
-
-
-
 
     public function show($id)
     {
@@ -129,4 +138,20 @@ class ProductController extends DashboardController
             return redirect()->route('products.index')->with('error','gagal menghapus produk');
         }
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $products = Produk::where('nama', 'like', "%$query%")->get();
+        return view('user.search_results', compact('products'));
+    }
+
+    public function byKategori($id)
+    {
+        $kategori = Kategori::find($id);
+        $produk = Produk::where('kategori_id', $id)->get();
+
+        return view('user.kategori', compact('kategori', 'produk'));
+    }
+
 }

@@ -3,62 +3,40 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Kategori;
+use App\Models\Produk;
+use App\Models\Cart;
 
 class HomeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $kategoris = Kategori::all();
+        $produk = Produk::all();
+        $bestSellingProducts = Produk::orderBy('sold', 'desc')->take(5)->get();
+        $recommendedProducts = Produk::inRandomOrder()->take(5)->get();
+
+        $cartCount = auth()->check() ? auth()->user()->carts->count() : 0;
+
+        return view('home', [
+            'kategoris' => $kategoris,
+            'produk' => $produk,
+            'bestSellingProducts' => $bestSellingProducts,
+            'recommendedProducts' => $recommendedProducts,
+            'cartCount' => $cartCount
+        ]);
+
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function dashboard()
     {
-        //
+        return view('dashboard');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function navbar()
     {
-        //
+        $kategoris = Kategori::all();
+        return view('pages.cart.index', compact('kategoris'));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

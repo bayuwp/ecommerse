@@ -14,6 +14,7 @@ class StoreRequest extends FormRequest
             'harga' => 'required|numeric',
             'deskripsi' => 'nullable|string',
             'foto_produk' => 'required|file|mimes:jpeg,png,jpg,gif|max:2048',
+            'sold' => 'required|integer|min:0',
         ];
     }
 

@@ -6,19 +6,18 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
-    public function authorize()
-    {
-        return true;
-    }
-
     public function rules()
     {
         return [
             'nama' => 'required|string|max:255',
             'keterangan' => 'nullable|string',
-            'kategori_id' => 'required|exists:kategoris,id',
-
+            'kategori_id' => 'nullable|exists:kategoris,id',
         ];
+    }
+
+    public function authorize()
+    {
+        return true;
     }
 
     public function messages()
@@ -27,6 +26,7 @@ class UpdateRequest extends FormRequest
             'nama.required' => 'Nama kategori harus diisi.',
             'nama.string' => 'Nama kategori harus berupa teks.',
             'nama.max' => 'Nama kategori tidak boleh lebih dari 255 karakter.',
+            'kategori_id.exists' => 'Kategori induk tidak valid.',
             'keterangan.string' => 'Keterangan harus berupa teks.',
         ];
     }

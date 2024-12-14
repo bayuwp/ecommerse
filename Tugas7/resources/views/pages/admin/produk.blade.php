@@ -3,7 +3,20 @@
 @section('container')
     <p>Body Products</p>
 
+    <!-- Filter Kategori -->
+    <div class="form-group">
+        <label for="category-filter">Filter berdasarkan Kategori:</label>
+        <select id="category-filter" class="form-control" onchange="filterProductsByCategory()">
+            <option value="">Semua Kategori</option>
+            @foreach ($kategoris as $kategori)
+                <option value="{{ $kategori->id }}">{{ $kategori->nama }}</option>
+            @endforeach
+        </select>
+    </div>
+
+
     <!-- Button trigger modal -->
+
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" onclick="resetForm()">
         Tambah Produk
     </button>
@@ -34,6 +47,7 @@
             </div>
         @endforeach
     </div>
+
 
     <!-- Modal Checkout -->
     <div class="modal fade" id="checkoutModal" tabindex="-1" role="dialog" aria-labelledby="checkoutModalLabel" aria-hidden="true">
@@ -158,16 +172,20 @@
                         <!-- Deskripsi Produk -->
                         <label for="product-description" class="col-form-label">Deskripsi Produk:</label>
                         <textarea class="form-control" id="product-description" name="deskripsi" rows="3"></textarea>
+
+                        <!-- Jumlah Terjual (Sold) -->
+                        <label for="product-sold" class="col-form-label">Jumlah Terjual:</label>
+                        <input type="number" class="form-control" id="product-sold" name="sold" value="0" min="0">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Save changes</button>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>
+
 
 @endsection
 
@@ -175,6 +193,36 @@
     <script>
 
 $(document).ready(function() {
+    function filterProductsByCategory() {
+        const kategoriId = document.getElementById('category-filter').value;
+
+        fetch(`/produk/filter?kategori_id=${kategoriId}`)
+            .then(response => response.json())
+            .then(data => {
+                const productList = document.getElementById('product-list');
+                productList.innerHTML = '';
+
+                if (data.products.length === 0) {
+                    productList.innerHTML = '<p>Tidak ada produk di kategori ini.</p>';
+                } else {
+                    data.products.forEach(product => {
+                        const productCard = `
+                            <div class="card" style="width: 18rem; margin: 10px;">
+                                <img src="${product.foto_produk}" class="card-img-top" alt="${product.nama}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${product.nama}</h5>
+                                    <p class="card-text">${product.deskripsi}</p>
+                                    <p class="card-text">Rp ${new Intl.NumberFormat().format(product.harga)}</p>
+                                </div>
+                            </div>
+                        `;
+                        productList.innerHTML += productCard;
+                    });
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
     function getProvinces() {
         $.ajax({
             url: 'http://localhost:8000/api/rajaongkir/provinces',
@@ -223,7 +271,7 @@ $(document).ready(function() {
             url: 'http://localhost:8000/api/rajaongkir/cities/' + provinceId,
             method: 'GET',
             success: function(data) {
-                const cities = data.rajaongkir.results;
+                const cities = data.results;
 
                 if (cities && cities.length > 0) {
                     selectElement.empty();
@@ -268,6 +316,7 @@ $(document).ready(function() {
 
     getProvinces();
 });
+
 
 function submitCheckout() {
     let form = document.getElementById('checkout-form');
@@ -382,7 +431,7 @@ function processPayment() {
     showResultForm(data);
 }
 
-    function submitForm() {
+function submitForm() {
         let form = document.getElementById('product-form');
         let data = new FormData(form);
 
@@ -414,7 +463,7 @@ function processPayment() {
             document.getElementById('product-name').value = product.nama;
             document.getElementById('product-price').value = product.harga;
             document.getElementById('product-description').value = product.deskripsi;
-            document.getElementById('product-photo').value = ''; // Reset file input
+            document.getElementById('product-photo').value = '';
         }
 
         function resetForm() {

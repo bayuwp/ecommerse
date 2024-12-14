@@ -24,15 +24,17 @@ class CheckoutController extends Controller
         $request->validate([
             'shipping_cost' => 'required|numeric',
             'shipping_service' => 'required|string',
+            'quantities' => 'required|array',
+            'quantities.*' => 'numeric|min:1',
         ]);
 
         try {
             $latestTransaction = Transaksi::latest()->first();
-            $customerDetails = Pelanggan::find($latestTransaction->pelanggan_id);
-
             if (!$latestTransaction) {
                 return response()->json(['status' => 'error', 'message' => 'Tidak ada transaksi sebelumnya ditemukan.'], 404);
             }
+
+            $customerDetails = Pelanggan::findOrFail($latestTransaction->pelanggan_id);
 
             $transaction = new Transaksi;
             $transaction->pelanggan_id = $latestTransaction->pelanggan_id;
@@ -50,26 +52,54 @@ class CheckoutController extends Controller
             Config::$clientKey = env('MIDTRANS_CLIENT_KEY');
             Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
 
-            $params = [
-                'transaction_details' => [
-                    'order_id' => $transaction->order_id,
-                    'gross_amount' => $transaction->gross_amount,
-                ],
+            $itemDetails = [];
+            $totalAmount = 0;
+
+            foreach ($request->quantities as $productId => $quantity) {
+                $product = Produk::findOrFail($productId);
+
+                $totalAmount += $product->harga * $quantity;
+
+                $itemDetails[] = [
+                    'id' => $product->id,
+                    'price' => $product->harga,
+                    'quantity' => $quantity,
+                    'name' => $product->nama,
+                ];
+            }
+
+            $totalAmount += $request->shipping_cost;
+
+            $itemDetails[] = [
+                'id' => 'courier',
+                'price' => $request->shipping_cost,
+                'quantity' => 1,
+                'name' => 'Ongkos Kirim (' . strtoupper($request->shipping_service) . ')',
+            ];
+
+            $transactionDetails = [
+                'order_id' => $transaction->order_id,
+                'gross_amount' => $totalAmount,
+            ];
+
+            $transactionData = [
+                'transaction_details' => $transactionDetails,
+                'item_details' => $itemDetails,
                 'customer_details' => [
                     'first_name' => $customerDetails->nama_lengkap,
-                    'last_name' => '',
                     'email' => $customerDetails->email,
                     'phone' => $customerDetails->nomer_hp,
                 ],
             ];
 
-            $paymentUrl = Snap::createTransaction($params)->redirect_url;
+            $paymentUrl = Snap::createTransaction($transactionData)->redirect_url;
 
             return response()->json(['status' => 'success', 'redirect_url' => $paymentUrl]);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
     }
+
 
 
     public function getToken(Request $request)
